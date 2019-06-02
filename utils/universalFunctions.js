@@ -3,7 +3,7 @@
  */
 var MD5 = require("md5");
 var Boom = require("boom");
-var CONFIG = require("../Config");
+var CONFIG = require("../config");
 var randomstring = require("randomstring");
 var validator = require("validator");
 
