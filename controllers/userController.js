@@ -8,6 +8,7 @@ var _ = require("underscore")
 
 var registerUser = function(payloadData, callback) {
   var userData;
+  var cardData;
   payloadData.password = universalFunctions.CryptData(payloadData.password);
   async.series(
     [
@@ -73,6 +74,55 @@ var registerUser = function(payloadData, callback) {
           if (err) cb(err);
           else cb();
         });
+      },
+      function(cb) {
+        var payloadStripe = {
+          customerId: userData.stripeId
+        };
+        Service.PaymentService.addStripeCard(payloadStripe, function(
+          err,
+          data
+        ) {
+          console.log(err, data);
+          if (err) cb(err);
+          else {
+            cardData = {
+              cardNumber: data.last4,
+              cardType: data.brand,
+              cardId: data.id
+            };
+            cb();
+          }
+        });
+      },
+      function(cb) {
+        var criteria = {
+          _id: userData._id
+        };
+        var dataToUpdate = {
+          $push: {
+            paymentCard: cardData
+          }
+        };
+        Service.UserService.updateUser(criteria, dataToUpdate, {}, function(
+          err,
+          data
+        ) {
+          if (err) cb(err);
+          else cb();
+        });
+      },
+      function(cb){
+        var criteria = {
+            _id: userData._id
+          };
+          Service.UserService.getUser(criteria,{},{},function(err,data){
+              if(err) cb(err)
+              else {
+                  userData = (data && data[0]) || null
+                  cb()
+              }
+          })
       }
     ],
     function(err, result) {
