@@ -1,4 +1,4 @@
-var Models = require("../Models");
+var Models = require("../models");
 var universalFunctions = require("../utils/universalFunctions");
 var config = require("../config");
 var stripe = require("stripe")(config.APP_CONSTANTS.PAYMENT_GATEWAY.SECRET_KEY);
